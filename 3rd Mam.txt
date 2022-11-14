@@ -1,0 +1,271 @@
+
+
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Title of Assignment-3-A:
+#     Implementing neural networks with Keras and TensorFlow for Image Classification Problem
+#     a. Import the necessary packages
+#     b. Load the training and testing data (FASION MNIST)
+#     c. Define the network architecture using Keras
+#     d. Train the model using SGD
+#     e. Evaluate the network
+#     f. Plot the training loss and accuracy
+# 
+
+# # Importing libraries
+
+# In[1]:
+
+
+#importing necessary libraries
+import tensorflow as tf
+from tensorflow import keras
+
+
+# In[9]:
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+get_ipython().run_line_magic('matplotlib', 'inline')
+
+
+# # Loading and preparing the data
+
+# Fashion-MNIST is a dataset of Zalando's article images—consisting of a training set of 60,000 examples and a test set of 10,000 examples. Each example is a 28x28 grayscale image, associated with a label from 10 classes.
+# Each image is 28 pixels in height and 28 pixels in width, for a total of 784 pixels in total. Each pixel has a single pixel-value associated with it, indicating the lightness or darkness of that pixel, with higher numbers meaning darker. This pixel-value is an integer between 0 and 255. The training and test data sets have 785 columns. The first column consists of the class labels (see above), and represents the article of clothing. The rest of the columns contain the pixel-values of the associated image.
+# 
+# Labels
+# 
+# Each training and test example is assigned to one of the following labels:
+# 
+# 
+# 0 T-shirt/top
+# 
+# 1 Trouser
+# 
+# 2 Pullover
+# 
+# 3 Dress
+# 
+# 4 Coat
+# 
+# 5 Sandal
+# 
+# 6 Shirt
+# 
+# 7 Sneaker
+# 
+# 8 Bag
+# 
+# 9 Ankle boot
+# 
+
+# In[2]:
+
+
+#import dataset and split into train and test data
+fmnist = tf.keras.datasets.fashion_mnist
+(x_train, y_train), (x_test, y_test) = fmnist.load_data()
+
+
+# In[3]:
+
+
+#to see length of training dataset
+len(x_train)
+
+
+# In[4]:
+
+
+##to see length of testing dataset
+len(x_test)
+
+
+# In[5]:
+
+
+#shape of training dataset  60,000 images having 28*28 size
+x_train.shape
+
+
+# In[6]:
+
+
+#shape of testing dataset  10,000 images having 28*28 size
+x_test.shape
+
+
+# In[7]:
+
+
+x_train[0]
+
+
+# In[10]:
+
+
+#to see how first image look
+plt.matshow(x_train[0])
+
+
+# In[126]:
+
+
+#normalize the images by scaling pixel intensities to the range 0,1
+x_train = x_train / 255
+x_test = x_test / 255
+
+
+# In[127]:
+
+
+x_train[0]
+
+
+# # Creating the model
+# 
+
+# The ReLU function is one of the most popular activation functions. 
+# It stands for “rectified linear unit”. Mathematically this function is defined as:
+# y = max(0,x)The ReLU function returns “0” if the input is negative and is linear if 
+# the input is positive.
+# 
+# The softmax function is another activation function. 
+# It changes input values into values that reach from 0 to 1.
+
+# In[13]:
+
+
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(28, 28)),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dense(10, activation='softmax')
+])
+
+
+# In[14]:
+
+
+model.summary()
+
+
+# # Compile the model
+
+# In[15]:
+
+
+model.compile(optimizer='sgd',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+
+# # Train the model
+
+# In[90]:
+
+
+history=model.fit(x_train, y_train,epochs=10) #,validation_data=(x_test,y_test),epochs=10)
+
+
+# # Evaluate the model
+
+# In[91]:
+
+
+test_loss,test_acc=model.evaluate(x_test,y_test)
+print("Loss=%.3f" %test_loss)
+print("Accuracy=%.3f" %test_acc)
+
+
+# # Making Prediction on Data
+
+# In[128]:
+
+
+plt.matshow(x_test[1])
+
+
+# In[93]:
+
+
+x_test.shape
+
+
+# 
+
+# In[116]:
+
+
+#we use predict() on new data
+predicted_value=model.predict(x_test)
+#print("Image is= %d" %np.argmax(predicted_value[0]))
+
+
+# In[118]:
+
+
+predicted_value.shape
+
+
+# In[129]:
+
+
+predicted_value[1]
+
+
+# In[130]:
+
+
+np.argmax(predicted_value[1])
+
+
+# In[119]:
+
+
+class_labels = ["T-shirt/top","Trouser","Pullover","Dress","Coat","Sandal","Shirt","Sneaker","Bag","Ankle boot"]
+
+
+# In[131]:
+
+
+class_labels[np.argmax(predicted_value[1])]
+
+
+# # Plot graph for Accuracy VS Loss
+
+# In[102]:
+
+
+get_ipython().run_line_magic('pinfo2', 'history.history')
+
+
+# In[100]:
+
+
+history.history.keys()
+
+
+# In[110]:
+
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['loss'])
+plt.title('model accuracy vs loss')
+plt.ylabel('accuracy/loss')
+plt.xlabel('epoch')
+plt.legend(['accuracy', 'loss'], loc='best')
+plt.show()
+
+
+# graph representing the model’s accuracy vs loss
+
+# Conclusion: With above code We can see, that throughout the epochs, our model accuracy 
+#     increases and our model loss decreases,that is good since our model gains confidence
+#     with its predictions.
+
+#
